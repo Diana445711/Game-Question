@@ -20,7 +20,6 @@ def root():
     return {"message": "Snakes and Ladders Question API running"}
 
 
-# Preload all difficulties for full game 
 @app.get("/game_questions")
 def get_game_questions(
     easy_count: int = 20,
@@ -30,11 +29,11 @@ def get_game_questions(
 ):
     batch = {"easy": [], "medium": [], "hard": []}
 
-    for _ in range(easy_count):
-        batch["easy"].append(generate_mcq(topic=topic, difficulty="easy"))
-    for _ in range(medium_count):
-        batch["medium"].append(generate_mcq(topic=topic, difficulty="medium"))
-    for _ in range(hard_count):
-        batch["hard"].append(generate_mcq(topic=topic, difficulty="hard"))
+    for difficulty, count in [("easy", easy_count), ("medium", medium_count), ("hard", hard_count)]:
+        for _ in range(count):
+            try:
+                batch[difficulty].append(generate_mcq(topic=topic, difficulty=difficulty))
+            except Exception as e:
+                batch[difficulty].append({"error": str(e)})
 
     return batch
